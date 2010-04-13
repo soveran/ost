@@ -1,7 +1,7 @@
 Ost
 ===
 
-Manage your Redis based queues and workers.
+Redis based queues and workers.
 
 Description
 -----------
@@ -40,6 +40,8 @@ A worker is a Ruby file with this basic code:
     Ost[:rss_feeds].each do |id|
       ...
     end
+
+It will pop items from the queue with a timeout of two seconds and retry indefinitely. If you want to configure the timeout, set the environment variable `OST_TIMEOUT`.
 
 Available methods for a queue are `push` (aliased to `<<`) and `pop` (aliased to `each`).
 

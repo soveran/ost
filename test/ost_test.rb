@@ -72,6 +72,6 @@ class TestOst < Test::Unit::TestCase
     assert_equal 0, @redis.llen("ost:events")
     assert_equal 1, @redis.llen("ost:events:errors")
 
-    assert_match /ost:events:1 => #<RuntimeError: Wrong answer/, @redis.rpop("ost:events:errors")
+    assert_match /ost:events:1 => #<RuntimeError: Wrong answer/, @results.pop
   end
 end

@@ -3,6 +3,8 @@ Ost
 
 Redis based queues and workers.
 
+![Ost Cafe, by Arancia Project](http://farm4.static.flickr.com/3255/3161710005_36566b8a9e.jpg)
+
 Description
 -----------
 

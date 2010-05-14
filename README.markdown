@@ -73,7 +73,7 @@ Differences with Delayed::Job and Resque
 --------------------------------------
 
 Both [Delayed::Job](http://github.com/tobi/delayed_job) and [Resque](http://github.com/defunkt/resque)
-provide queues and workers (the later using Redis). They provide dumb workers that process jobs, which are specialized for each task. The specialization takes place in the application side, and the job is serialized and pushed into a queue.
+provide queues and workers (the latter using Redis). They provide dumb workers that process jobs, which are specialized for each task. The specialization takes place in the application side, and the job is serialized and pushed into a queue.
 
 **Ost**, by contrast, just pushes numbers into specialized queues, and uses workers that are subscribed to specific queues and know what to do with the items they get. The total sum of logic is almost the same.
 

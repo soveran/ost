@@ -55,7 +55,7 @@ module Ost
   end
 
   def self.connect(options = {})
-    @redis = Redis.new(options)
+    @redis = Redis.connect(options)
   end
 
   def self.redis

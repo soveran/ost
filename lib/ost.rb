@@ -59,7 +59,7 @@ module Ost
   end
 
   def self.redis
-    @redis ||= Redis.new
+    @redis ||= Redis.connect
   end
 
   def self.redis=(redis)

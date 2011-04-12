@@ -82,7 +82,7 @@ provide queues and workers (the latter using Redis). They provide dumb workers t
 Installation
 ------------
 
-    $ sudo gem install ost
+    $ gem install ost
 
 License
 -------

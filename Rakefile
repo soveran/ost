@@ -1,5 +1,6 @@
 task :test do
-  system "cd test && ruby ost_test.rb"
+  require "cutest"
+  Cutest.run(Dir["test/ost*"])
 end
 
 task :default => :test

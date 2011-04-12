@@ -1,63 +1,70 @@
-require File.join(File.dirname(__FILE__), "test_helper")
+require File.expand_path("test_helper", File.dirname(__FILE__))
 
-class TestOst < Test::Unit::TestCase
+scope do
   def ost(&job)
     thread = Thread.new do
+      Ost.redis = Redis.current
       Ost[:events].each(&job)
     end
 
-    sleep 0.2
+    sleep 0.1
 
     thread.kill
   end
 
+  def enqueue(id)
+    Ost[:events].push(id)
+  end
+
+  prepare do
+    Ost.redis.flushall
+  end
+
   setup do
-    @redis = Redis.new
-    @redis.flushdb
-
-    Ost.connect
-    Ost[:events].push(1)
+    Redis.new
   end
 
-  teardown do
-    Ost.redis.flushdb
+  test "insert items in the queue" do |redis|
+    enqueue(1)
+    assert_equal ["1"], redis.lrange("ost:events", 0, -1)
   end
 
-  should "insert items in the queue" do
-    assert_equal ["1"], @redis.lrange("ost:events", 0, -1)
-  end
+  test "process items from the queue" do |redis|
+    enqueue(1)
 
-  should "process items from the queue" do
-    @results = []
+    results = []
 
     ost do |item|
-      @results << item
+      results << item
     end
 
-    assert_equal [], @redis.lrange("ost:events", 0, -1)
-    assert_equal ["1"], @results
+    assert_equal [], redis.lrange("ost:events", 0, -1)
+    assert_equal ["1"], results
   end
 
-  should "add failures to a special list" do
+  test "add failures to special lists" do |redis|
+    enqueue(1)
+
     ost do |item|
       raise "Wrong answer"
     end
 
-    assert_equal 0, @redis.llen("ost:events")
-    assert_equal 1, @redis.llen("ost:events:errors")
+    assert_equal 0, redis.llen("ost:events")
+    assert_equal 1, redis.llen("ost:events:errors")
 
-    assert_match /ost:events:1 => #<RuntimeError: Wrong answer/, @redis.rpop("ost:events:errors")
+    assert redis.rpop("ost:events:errors").match(/ost:events:1 => #<RuntimeError: Wrong answer/)
   end
 
-  should "publish the error to a specific channel" do
-    @results = []
+  test "publish the error to a specific channel" do |redis|
+    enqueue(1)
+    results = []
 
     t1 = Thread.new do
-      @redis.subscribe("ost:events:errors") do |on|
+      redis.subscribe("ost:events:errors") do |on|
         on.message do |channel, message|
           if message[/ost:events:1 => #<RuntimeError: Wrong answer/]
-            @results << message
-            @redis.unsubscribe
+            results << message
+            redis.unsubscribe
           end
         end
       end
@@ -69,9 +76,9 @@ class TestOst < Test::Unit::TestCase
 
     t1.kill
 
-    assert_equal 0, @redis.llen("ost:events")
-    assert_equal 1, @redis.llen("ost:events:errors")
+    assert_equal 0, redis.llen("ost:events")
+    assert_equal 1, redis.llen("ost:events:errors")
 
-    assert_match /ost:events:1 => #<RuntimeError: Wrong answer/, @results.pop
+    assert results.pop.match(/ost:events:1 => #<RuntimeError: Wrong answer/)
   end
 end

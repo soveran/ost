@@ -1,4 +1,4 @@
-<% require "lib/ost" -%>
+<% require "./lib/ost" -%>
 Gem::Specification.new do |s|
   s.name              = "ost"
   s.version           = "<%= Ost::VERSION %>"
@@ -15,4 +15,7 @@ Gem::Specification.new do |s|
     "*.gemspec",
     "test/*.*"
   ].inspect %>
+
+  s.add_dependency "nest", "~> 1.0"
+  s.add_development_dependency "cutest", "~> 1.0"
 end

@@ -16,7 +16,11 @@ module Ost
     end
 
     def each(&block)
+      @stopping = false
+
       loop do
+        break if @stopping
+
         _, item = redis.brpop(ns, TIMEOUT)
         next if item.nil? or item.empty?
 
@@ -35,6 +39,10 @@ module Ost
       redis.lrange ns[:errors], 0, -1
     end
 
+    def stop
+      @stopping = true
+    end
+
     alias << push
     alias pop each
 
@@ -50,6 +58,12 @@ module Ost
   def self.[](queue)
     @queues[queue]
   end
+
+  def self.stop
+    @queues.each { |_, queue| queue.stop }
+  end
+
+  @options = nil
 
   def self.connect(options = {})
     @options = options

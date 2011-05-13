@@ -3,7 +3,6 @@ require File.expand_path("test_helper", File.dirname(__FILE__))
 scope do
   def ost(&job)
     thread = Thread.new do
-      Ost.redis = Redis.current
       Ost[:events].each(&job)
     end
 
@@ -17,10 +16,11 @@ scope do
   end
 
   prepare do
-    Ost.redis.flushall
+    Redis.current.flushall
   end
 
   setup do
+    Ost[:events].redis.quit
     Redis.new
   end
 
@@ -74,7 +74,7 @@ scope do
       raise "Wrong answer"
     end
 
-    t1.kill
+    t1.join
 
     assert_equal 0, redis.llen("ost:events")
     assert_equal 1, redis.llen("ost:events:errors")

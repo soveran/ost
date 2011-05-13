@@ -38,10 +38,8 @@ module Ost
     alias << push
     alias pop each
 
-  private
-
     def redis
-      Ost.redis
+      @redis ||= Redis.connect(Ost.options)
     end
   end
 
@@ -54,14 +52,10 @@ module Ost
   end
 
   def self.connect(options = {})
-    @redis = Redis.connect(options)
+    @options = options
   end
 
-  def self.redis
-    @redis ||= Redis.connect
-  end
-
-  def self.redis=(redis)
-    @redis = redis
+  def self.options
+    @options || {}
   end
 end

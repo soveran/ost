@@ -18,8 +18,8 @@ module Ost
 
     def each(&block)
       loop do
-        _, item = redis.brpop(ns, TIMEOUT)
         break if stopped?
+        _, item = redis.brpop(ns, TIMEOUT)
         next if item.nil? or item.empty?
 
         begin

@@ -82,12 +82,13 @@ scope do
     assert results.pop.match(/ost:events:1 => #<RuntimeError: Wrong answer/)
   end
 
-  test "halt processing a queue" do
+  test "halt processing a queue with multiple workers" do
     Thread.new do
       sleep 0.5
-      Ost[:always_empty].stop
+      Ost[:always_empty].dup.stop
     end
 
+    Ost[:always_empty].each { }
     Ost[:always_empty].each { }
 
     assert true

@@ -12,15 +12,13 @@ module Ost
     end
 
     def push(value)
+      unstop
       redis.lpush(ns, value)
     end
 
     def each(&block)
-      @stopping = false
-
       loop do
-        break if @stopping
-
+        break if stopped?
         _, item = redis.brpop(ns, TIMEOUT)
         next if item.nil? or item.empty?
 
@@ -40,7 +38,15 @@ module Ost
     end
 
     def stop
-      @stopping = true
+      redis.set ns[:stop], 1
+    end
+
+    def unstop
+      redis.del ns[:stop]
+    end
+
+    def stopped?
+      redis.exists ns[:stop]
     end
 
     alias << push

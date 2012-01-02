@@ -3,6 +3,7 @@ require "nest"
 module Ost
   VERSION = "0.0.3"
   TIMEOUT = ENV["OST_TIMEOUT"] || 2
+  QSTOP = "QSTOP"
 
   class Queue
     attr :ns
@@ -16,13 +17,10 @@ module Ost
     end
 
     def each(&block)
-      @stopping = false
-
       loop do
-        break if @stopping
-
         _, item = redis.brpop(ns, TIMEOUT)
         next if item.nil? or item.empty?
+        break if item == QSTOP
 
         begin
           block.call(item)
@@ -40,7 +38,7 @@ module Ost
     end
 
     def stop
-      @stopping = true
+      push(QSTOP)
     end
 
     alias << push

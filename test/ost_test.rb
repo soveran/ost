@@ -85,7 +85,7 @@ scope do
   test "halt processing a queue" do
     Thread.new do
       sleep 0.5
-      Ost[:always_empty].stop
+      Ost[:always_empty].dup.stop
     end
 
     Ost[:always_empty].each { }

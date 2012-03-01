@@ -87,4 +87,8 @@ scope do
 
     assert_equal ["1"], Ost[:events].items
   end
+
+  test "allows access to the underlying key" do
+    assert_equal 0, Ost[:events].key.llen
+  end
 end

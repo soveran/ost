@@ -5,14 +5,14 @@ module Ost
   TIMEOUT = ENV["OST_TIMEOUT"] || 2
 
   class Queue
-    attr :ns
+    attr :key
 
     def initialize(name)
-      @ns = Nest.new(:ost)[name]
+      @key = Nest.new(:ost)[name]
     end
 
     def push(value)
-      redis.lpush(ns, value)
+      key.lpush(value)
     end
 
     def each(&block)
@@ -21,7 +21,7 @@ module Ost
       loop do
         break if @stopping
 
-        _, item = redis.brpop(ns, TIMEOUT)
+        _, item = key.brpop(TIMEOUT)
         next if item.nil? or item.empty?
 
         block.call(item)
@@ -33,7 +33,7 @@ module Ost
     end
 
     def items
-      ns.lrange(0, -1)
+      key.lrange(0, -1)
     end
 
     alias << push

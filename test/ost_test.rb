@@ -3,12 +3,14 @@ require File.expand_path("test_helper", File.dirname(__FILE__))
 scope do
   def ost(&job)
     thread = Thread.new do
-      Ost[:events].each(&job)
+      Ost[:events].each do |item|
+        begin
+          yield(item)
+        ensure
+          thread.kill
+        end
+      end
     end
-
-    sleep 0.1
-
-    thread.kill
   end
 
   def enqueue(id)
@@ -45,41 +47,13 @@ scope do
   test "add failures to special lists" do |redis|
     enqueue(1)
 
-    ost do |item|
-      raise "Wrong answer"
-    end
-
-    assert_equal 0, redis.llen("ost:events")
-    assert_equal 1, redis.llen("ost:events:errors")
-
-    assert redis.rpop("ost:events:errors").match(/ost:events:1 => #<RuntimeError: Wrong answer/)
-  end
-
-  test "publish the error to a specific channel" do |redis|
-    enqueue(1)
-    results = []
-
-    t1 = Thread.new do
-      redis.subscribe("ost:events:errors") do |on|
-        on.message do |channel, message|
-          if message[/ost:events:1 => #<RuntimeError: Wrong answer/]
-            results << message
-            redis.unsubscribe
-          end
-        end
+    assert_raise do
+      Ost[:events].each do |item|
+        item.some_error
       end
     end
 
-    ost do |item|
-      raise "Wrong answer"
-    end
-
-    t1.join
-
     assert_equal 0, redis.llen("ost:events")
-    assert_equal 1, redis.llen("ost:events:errors")
-
-    assert results.pop.match(/ost:events:1 => #<RuntimeError: Wrong answer/)
   end
 
   test "halt processing a queue" do

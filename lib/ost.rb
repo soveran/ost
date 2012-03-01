@@ -24,19 +24,8 @@ module Ost
         _, item = redis.brpop(ns, TIMEOUT)
         next if item.nil? or item.empty?
 
-        begin
-          block.call(item)
-        rescue Exception => e
-          error = "#{Time.now} #{ns[item]} => #{e.inspect}"
-
-          redis.rpush   ns[:errors], error
-          redis.publish ns[:errors], error
-        end
+        block.call(item)
       end
-    end
-
-    def errors
-      redis.lrange ns[:errors], 0, -1
     end
 
     def stop

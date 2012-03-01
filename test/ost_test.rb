@@ -81,4 +81,10 @@ scope do
 
     assert true
   end
+
+  test "allows access to the queued items" do
+    enqueue(1)
+
+    assert_equal ["1"], Ost[:events].items
+  end
 end

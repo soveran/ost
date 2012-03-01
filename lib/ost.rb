@@ -32,6 +32,10 @@ module Ost
       @stopping = true
     end
 
+    def items
+      ns.lrange(0, -1)
+    end
+
     alias << push
     alias pop each
 

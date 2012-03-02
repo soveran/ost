@@ -1,3 +1,5 @@
+ENV["OST_TIMEOUT"] = "1"
+
 require File.expand_path("test_helper", File.dirname(__FILE__))
 
 scope do

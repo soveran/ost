@@ -13,6 +13,8 @@ scope do
         end
       end
     end
+
+    thread.join
   end
 
   def enqueue(id)

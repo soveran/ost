@@ -95,4 +95,38 @@ scope do
   test "allows access to the underlying key" do
     assert_equal 0, Ost[:events].key.llen
   end
+
+  test "maintains a backup queue for when worker dies" do
+    enqueue(1)
+
+    assert_equal 0, Ost[:events].backup.llen
+
+    begin
+      Ost[:events].each do |item|
+        item.some_error
+      end
+    rescue
+    end
+
+    assert_equal ["1"], Ost[:events].backup.lrange(0, -1)
+  end
+
+  test "cleans up the backup queue on success" do
+    enqueue(1)
+
+    done = false
+
+    Thread.new do
+      Ost[:events].each do |item|
+        assert_equal ["1"], Ost[:events].backup.lrange(0, -1)
+        done = true
+      end
+    end
+
+    until done; end
+
+    Ost[:events].stop
+
+    assert_equal 0, Ost[:events].backup.llen
+  end
 end

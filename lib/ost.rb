@@ -2,13 +2,15 @@ require "nest"
 
 module Ost
   VERSION = "0.0.3"
-  TIMEOUT = ENV["OST_TIMEOUT"] || 2
+  TIMEOUT = ENV["OST_TIMEOUT"] || 0
 
   class Queue
     attr :key
+    attr :backup
 
     def initialize(name)
       @key = Nest.new(:ost)[name]
+      @backup = @key[:backup]
     end
 
     def push(value)
@@ -21,10 +23,11 @@ module Ost
       loop do
         break if @stopping
 
-        _, item = key.brpop(TIMEOUT)
-        next if item.nil? or item.empty?
+        item = @key.brpoplpush(@backup, TIMEOUT)
 
         block.call(item)
+
+        @backup.rpop
       end
     end
 

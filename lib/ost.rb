@@ -10,7 +10,7 @@ module Ost
 
     def initialize(name)
       @key = Nest.new(:ost)[name]
-      @backup = @key[:backup]
+      @backup = @key[Socket.gethostname][Process.pid]
     end
 
     def push(value)
@@ -27,7 +27,7 @@ module Ost
 
         block.call(item)
 
-        @backup.rpop
+        @backup.del
       end
     end
 

@@ -30,9 +30,14 @@ scope do
     Redis.new
   end
 
-  test "insert items in the queue" do |redis|
+  test "allows access to the queued items" do
     enqueue(1)
-    assert_equal ["1"], redis.lrange("ost:events", 0, -1)
+
+    assert_equal ["1"], Ost[:events].items
+  end
+
+  test "allows access to the underlying key" do
+    assert_equal 0, Ost[:events].key.llen
   end
 
   test "process items from the queue" do |redis|
@@ -44,20 +49,8 @@ scope do
       results << item
     end
 
-    assert_equal [], redis.lrange("ost:events", 0, -1)
+    assert_equal [], Ost[:events].items
     assert_equal ["1"], results
-  end
-
-  test "add failures to special lists" do |redis|
-    enqueue(1)
-
-    assert_raise do
-      Ost[:events].each do |item|
-        item.some_error
-      end
-    end
-
-    assert_equal 0, redis.llen("ost:events")
   end
 
   test "halt processing a queue" do
@@ -84,16 +77,6 @@ scope do
     t2.join
 
     assert true
-  end
-
-  test "allows access to the queued items" do
-    enqueue(1)
-
-    assert_equal ["1"], Ost[:events].items
-  end
-
-  test "allows access to the underlying key" do
-    assert_equal 0, Ost[:events].key.llen
   end
 
   test "maintains a backup queue for when worker dies" do

@@ -27,7 +27,7 @@ module Ost
 
         block.call(item)
 
-        @backup.del
+        @backup.lpop
       end
     end
 

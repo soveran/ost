@@ -111,5 +111,6 @@ scope do
     Ost[:events].stop
 
     assert_equal 0, Ost[:events].backup.llen
+    assert_equal false, Ost[:events].backup.exists
   end
 end

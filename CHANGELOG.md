@@ -1,4 +1,8 @@
-# 1.0.0 - unreleased
+# 0.1.1
+
+* Use backup.lpop instead of backup.del
+
+# 0.1.0
 
 * `Ost#each` no longer rescues exceptions for you.
 

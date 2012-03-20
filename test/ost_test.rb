@@ -58,7 +58,7 @@ scope do
 
     Thread.new do
       sleep 2
-      enqueue(1)
+      redis.lpush(Ost[:events].key, 1)
     end
 
     ost do |item|

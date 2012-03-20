@@ -1,7 +1,7 @@
 require "nest"
 
 module Ost
-  VERSION = "0.1.2"
+  VERSION = "0.1.3"
   TIMEOUT = ENV["OST_TIMEOUT"] || 2
 
   class Queue

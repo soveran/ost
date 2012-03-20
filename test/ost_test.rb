@@ -53,6 +53,22 @@ scope do
     assert_equal ["1"], results
   end
 
+  test "doesn't yield the block on timeout" do |redis|
+    results = []
+
+    Thread.new do
+      sleep 2
+      enqueue(1)
+    end
+
+    ost do |item|
+      results << item
+    end
+
+    assert_equal [], Ost[:events].items
+    assert_equal ["1"], results
+  end
+
   test "halt processing a queue" do
     Thread.new do
       sleep 0.5

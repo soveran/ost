@@ -25,6 +25,8 @@ module Ost
 
         item = @key.brpoplpush(@backup, TIMEOUT)
 
+        next unless item
+
         block.call(item)
 
         @backup.lpop

@@ -9,12 +9,17 @@ module Ost
     attr :backup
 
     def initialize(name)
-      @key = Nest.new(:ost)[name]
+      @name = name
+      @key = nest
       @backup = @key[Socket.gethostname][Process.pid]
     end
 
     def push(value)
       key.lpush(value)
+    end
+
+    def nest
+      Nest.new(:ost, redis)[@name]
     end
 
     def each(&block)
@@ -23,7 +28,7 @@ module Ost
       loop do
         break if @stopping
 
-        item = @key.brpoplpush(@backup, TIMEOUT)
+        item = nest.brpoplpush(@backup, TIMEOUT)
 
         next unless item
 
@@ -45,7 +50,7 @@ module Ost
     alias pop each
 
     def redis
-      @redis ||= Redis.connect(Ost.options)
+      Redis.connect(Ost.options)
     end
   end
 

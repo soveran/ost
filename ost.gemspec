@@ -1,8 +1,6 @@
-require "./lib/ost"
-
 Gem::Specification.new do |s|
   s.name              = "ost"
-  s.version           = Ost::VERSION
+  s.version           = "0.1.5"
   s.summary           = "Redis based queues and workers."
   s.description       = "Ost lets you manage queues and workers with Redis."
   s.authors           = ["Michel Martens"]

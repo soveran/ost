@@ -9,7 +9,7 @@ module Ost
     attr :backup
 
     def initialize(name)
-      @key = Nest.new(:ost)[name]
+      @key = Nest.new(:ost, redis)[name]
       @backup = @key[Socket.gethostname][Process.pid]
     end
 

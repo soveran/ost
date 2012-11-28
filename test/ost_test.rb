@@ -129,4 +129,10 @@ scope do
     assert_equal 0, Ost[:events].backup.llen
     assert_equal false, Ost[:events].backup.exists
   end
+
+  test "uses same redis instance" do
+    queue = Ost['foo']
+
+    assert_equal queue.key.redis, queue.redis
+  end
 end

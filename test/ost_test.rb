@@ -135,4 +135,26 @@ scope do
 
     assert_equal queue.key.redis, queue.redis
   end
+
+  test "report the queue size" do
+    queue = Ost[:size]
+
+    assert_equal 0, queue.size
+
+    queue << 1
+
+    assert_equal 1, queue.size
+
+    done = false
+
+    Thread.new do
+      Ost[:size].each do |item|
+        done = true
+      end
+    end
+
+    until done; end
+
+    assert_equal 0, queue.size
+  end
 end

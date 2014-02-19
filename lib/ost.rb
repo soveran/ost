@@ -43,6 +43,10 @@ module Ost
     alias << push
     alias pop each
 
+    def size
+      key.llen
+    end
+
     def redis
       @redis ||= Redis.connect(Ost.options)
     end

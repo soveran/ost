@@ -77,7 +77,7 @@ the same options as [redis-rb](https://github.com/redis/redis-rb).
 `Ost[:example].push item`, `Ost[:some_queue] << item`: add `item` to
 the `:example` queue.
 
-`Ost[:example].push { |item| ... }`, `Ost[:example].each { |item| ...
+`Ost[:example].pop { |item| ... }`, `Ost[:example].each { |item| ...
 }`: consume `item` from the `:example` queue. If the block doesn't
 complete successfully, the item will be left at a backup queue.
 

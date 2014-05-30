@@ -1,6 +1,7 @@
-ENV["OST_TIMEOUT"] = "1"
+require "cutest"
+require_relative "../lib/ost"
 
-require File.expand_path("test_helper", File.dirname(__FILE__))
+ENV["OST_TIMEOUT"] = "1"
 
 scope do
   def ost(&job)

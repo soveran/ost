@@ -22,17 +22,10 @@ module Ost
       loop do
         item = redis.call("BRPOPLPUSH", @key, @backup, TIMEOUT)
 
-        if item.nil?
-          if @stopping
-            break
-          else
-            next
-          end
+        if item
+          block.call(item)
+          redis.call("LPOP", @backup)
         end
-
-        block.call(item)
-
-        redis.call("LPOP", @backup)
 
         break if @stopping
       end

@@ -8,14 +8,7 @@ Gem::Specification.new do |s|
   s.homepage          = "http://github.com/soveran/ost"
   s.license           = "MIT"
 
-  s.files = Dir[
-    "LICENSE",
-    "README.md",
-    "Rakefile",
-    "lib/**/*.rb",
-    "*.gemspec",
-    "test/*.*"
-  ]
+  s.files = `git ls-files`.split("\n")
 
   s.add_dependency "nest", "~> 1.0"
   s.add_development_dependency "cutest", "~> 1.0"

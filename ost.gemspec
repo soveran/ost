@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.authors           = ["Michel Martens"]
   s.email             = ["michel@soveran.com"]
   s.homepage          = "http://github.com/soveran/ost"
+  s.license           = "MIT"
 
   s.files = Dir[
     "LICENSE",

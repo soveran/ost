@@ -1,34 +1,40 @@
-require "nest"
+require "nido"
+require "redic"
 
 module Ost
-  TIMEOUT = (ENV["OST_TIMEOUT"] || 2).to_i
+  TIMEOUT = ENV["OST_TIMEOUT"] || "2"
 
   class Queue
     attr :key
     attr :backup
 
     def initialize(name)
-      @key = Nest.new(:ost, redis)[name]
+      @key = Nido.new(:ost)[name]
       @backup = @key[Socket.gethostname][Process.pid]
+      @stopping = false
     end
 
     def push(value)
-      key.lpush(value)
+      redis.call("LPUSH", @key, value)
     end
 
     def each(&block)
-      @stopping = false
-
       loop do
-        break if @stopping
+        item = redis.call("BRPOPLPUSH", @key, @backup, TIMEOUT)
 
-        item = @key.brpoplpush(@backup, TIMEOUT)
-
-        next unless item
+        if item.nil?
+          if @stopping
+            break
+          else
+            next
+          end
+        end
 
         block.call(item)
 
-        @backup.lpop
+        redis.call("LPOP", @backup)
+
+        break if @stopping
       end
     end
 
@@ -37,18 +43,22 @@ module Ost
     end
 
     def items
-      key.lrange(0, -1)
+      redis.call("LRANGE", @key, 0, -1)
     end
 
     alias << push
     alias pop each
 
     def size
-      key.llen
+      redis.call("LLEN", @key)
     end
 
     def redis
-      @redis ||= Redis.connect(Ost.options)
+      defined?(@redis) ? @redis : Ost.redis
+    end
+
+    def redis=(redis)
+      @redis = redis
     end
   end
 
@@ -64,13 +74,11 @@ module Ost
     @queues.each { |_, queue| queue.stop }
   end
 
-  @options = nil
-
-  def self.connect(options = {})
-    @options = options
+  def self.redis
+    @redis ||= Redic.new
   end
 
-  def self.options
-    @options || {}
+  def self.redis=(redis)
+    @redis = redis
   end
 end

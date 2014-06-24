@@ -1,7 +1,7 @@
 require "nest"
 
 module Ost
-  TIMEOUT = ENV["OST_TIMEOUT"] || 2
+  TIMEOUT = ENV["OST_TIMEOUT"].to_i || 2
 
   class Queue
     attr :key

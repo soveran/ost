@@ -1,9 +1,11 @@
-## Unreleased
+## 0.1.6
+
+* Fix bug with non-integer timeouts
 
 * Add `Ost::Queue#size` method. Returns the current size of the queue.
 
   Example:
-  
+
   ```ruby
   Ost[:events].size # => 0
   Ost[:events].push(1)

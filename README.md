@@ -31,18 +31,34 @@ end
 Usage
 -----
 
-**Ost** connects to Redis automatically with the default options
-(localhost:6379, database 0).
+Ost uses a lightweight Redis client called [Redic][redic]. To connect to
+a Redis database, you will need to set an instance of `Redic`, with a URL
+of the form `redis://:<passwd>@<host>:<port>/<db>`.
 
-You can customize the connection by calling `connect`:
+You can customize the connection by calling `Ost.redis=`:
 
 ``` ruby
-Ost.connect port: 6380, db: 2
+require "ost"
+
+Ost.redis = Redic.new("redis://127.0.0.1:6379")
 ```
 
 Then you only need to refer to a queue for it to pop into existence:
 
 ``` ruby
+require "ost"
+
+Ost.redis = Redic.new("redis://127.0.0.1:6379")
+
+Ost[:rss_feeds] << @feed.id
+```
+
+Ost defaults to a Redic connection to `redis://127.0.0.1:6379`. The example
+above could be rewritten as:
+
+``` ruby
+require "ost"
+
 Ost[:rss_feeds] << @feed.id
 ```
 
@@ -57,7 +73,7 @@ end
 ```
 
 It will pop items from the queue as soon as they become available. It
-uses BRPOPLPUSH with a timeout that can be specified with the
+uses `BRPOPLPUSH` with a timeout that can be specified with the
 `OST_TIMEOUT` environment variable.
 
 Note that in these examples we are pushing numbers to the queue. As
@@ -68,18 +84,14 @@ pop.
 Available methods
 =================
 
-`Ost.connect`: configure the connection to Redis. By default, it
-connects to localhost in port 6379 and uses the database 0. It accepts
-the same options as [redis-rb](https://github.com/redis/redis-rb).
-
-`Ost.stop`: halt processing for all queues.
-
 `Ost[:example].push item`, `Ost[:some_queue] << item`: add `item` to
 the `:example` queue.
 
 `Ost[:example].pop { |item| ... }`, `Ost[:example].each { |item| ...
 }`: consume `item` from the `:example` queue. If the block doesn't
 complete successfully, the item will be left at a backup queue.
+
+`Ost.stop`: halt processing for all queues.
 
 `Ost[:example].stop`: halt processing for the `example` queue.
 
@@ -131,28 +143,4 @@ Installation
 
     $ gem install ost
 
-License
--------
-
-Copyright (c) 2010, 2011, 2012 Michel Martens
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+[redic]: https://github.com/amakawa/redic

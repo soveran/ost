@@ -1,3 +1,20 @@
+## Unreleased
+
+* Use [redic][redic] instead of `redis-rb` as the Redis client. This changes
+  how to connect to a Redis database:
+
+  Before:
+
+  ```ruby
+  Ost.connect(localhost: 6379, port: 6380, db: 2)
+  ```
+
+  Now:
+
+  ```ruby
+  Ost.redis = Redic.new("redis://127.0.0.1:6379/2")
+  ```
+
 ## 0.1.6
 
 * Fix bug with non-integer timeouts
@@ -46,3 +63,5 @@
 * Ost now uses `BRPOPLPUSH` and maintains a backup queue while working.
 
     You can access this queue using `Ost::Queue#backup`.
+
+[redic]: https://github.com/amakawa/redic

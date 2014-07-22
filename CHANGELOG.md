@@ -1,4 +1,4 @@
-## Unreleased
+## 1.0.0.rc1
 
 * Use [redic][redic] instead of `redis-rb` as the Redis client. This changes
   how to connect to a Redis database:

@@ -31,6 +31,15 @@ module Ost
       end
     end
 
+    def each_with_concurrency(size = 3, &block)
+      concurrency = Array.new(size).map do |iteration|
+        Thread.new(iteration) do |iteration|
+          each(&block)
+        end
+      end
+      concurrency.each(&:join)
+    end
+
     def stop
       @stopping = true
     end

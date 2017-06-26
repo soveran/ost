@@ -72,6 +72,16 @@ Ost[:rss_feeds].each do |id|
 end
 ```
 
+Each with concurrency
+
+``` ruby
+require "ost"
+
+Ost[:rss_feeds].each_with_concurrency(3) do |id|  #default 3
+  puts "*** #{id} | th: #{Thread.current.object_id}"
+end
+```
+
 It will pop items from the queue as soon as they become available. It
 uses `BRPOPLPUSH` with a timeout that can be specified with the
 `OST_TIMEOUT` environment variable.

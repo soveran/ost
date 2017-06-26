@@ -35,6 +35,18 @@ module Ost
       @stopping = true
     end
 
+    def pop_item(value, occurrences)
+      redis.call("LREM", @key, occurrences, value)
+    end
+
+    def pop_first
+      redis.call("LPOP", @key)
+    end
+
+    def pop_last
+      redis.call("RPOP", @key)
+    end
+
     def items
       redis.call("LRANGE", @key, 0, -1)
     end
